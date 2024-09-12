@@ -12,6 +12,9 @@ DWM_THUMBNAIL_PROPERTIES dskThumbProps;
 
 const int SCROLLBAR_SIZE = 30;
 
+int initialRcBottom = 0;
+int initialRcRight = 0;
+
 //MirrorType mirrorType = BITBLT;
 //MirrorType mirrorType = PRINT_WINDOW;
 MirrorType mirrorType = DWM_THUMBNAIL;
@@ -78,6 +81,9 @@ DWORD WINAPI dwmThumbnailMirror(int target) {
 	rcSource.right = mainRect.right - mainRect.left - SCROLLBAR_SIZE;
 	rcSource.bottom = mainRect.bottom - mainRect.top - (SCROLLBAR_SIZE * 1.8);
 
+	initialRcRight = rcSource.right;
+	initialRcBottom = rcSource.bottom;
+
 	// Define the destination rectangle where the thumbnail will be displayed
 	RECT rcDestination;
 	rcDestination.left = 0;
@@ -119,15 +125,33 @@ DWORD WINAPI mirrorWindow(LPVOID lParam) {
 
 	case DWM_THUMBNAIL:
 		return dwmThumbnailMirror(target);
-
 	}
 
 	return NULL;
 }
 
-void updateThumbnailPosition(int leftOffset, int rightOffset, int topOffset, int bottomOffset) {
+void adjustThumbnailPosition(int leftOffset, int rightOffset, int topOffset, int bottomOffset) {
 	dskThumbProps.rcSource.left += leftOffset;
 	dskThumbProps.rcSource.right += rightOffset;
 	dskThumbProps.rcSource.top += topOffset;
 	dskThumbProps.rcSource.bottom += bottomOffset;
+}
+
+void setThumbnailPosition(int left, int right, int top, int bottom) {
+	if (left >= 0)
+	{
+		dskThumbProps.rcSource.left = left;
+	}
+	if (right >= 0)
+	{
+		dskThumbProps.rcSource.right = initialRcRight + right;
+	}
+	if (top >= 0)
+	{
+		dskThumbProps.rcSource.top = top;
+	}
+	if (bottom >= 0)
+	{
+		dskThumbProps.rcSource.bottom = initialRcBottom + bottom;
+	}
 }

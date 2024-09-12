@@ -22,7 +22,7 @@ void handleVerticalScrolling(HWND hWnd, WPARAM wParam) {
         scrollInfo.nPos -= SCROLL_OFFSET;
         if (mirrorType == DWM_THUMBNAIL)
         {
-            updateThumbnailPosition(0, 0, (-SCROLL_OFFSET * 10), (-SCROLL_OFFSET * 10));
+            adjustThumbnailPosition(0, 0, (-SCROLL_OFFSET * 10), (-SCROLL_OFFSET * 10));
         }
         else
         {
@@ -35,7 +35,7 @@ void handleVerticalScrolling(HWND hWnd, WPARAM wParam) {
         scrollInfo.nPos += SCROLL_OFFSET;
         if (mirrorType == DWM_THUMBNAIL)
         {
-            updateThumbnailPosition(0, 0, (SCROLL_OFFSET * 10), (SCROLL_OFFSET * 10));
+            adjustThumbnailPosition(0, 0, (SCROLL_OFFSET * 10), (SCROLL_OFFSET * 10));
         }
         else
         {
@@ -49,7 +49,7 @@ void handleVerticalScrolling(HWND hWnd, WPARAM wParam) {
         std::cout << HIWORD(wParam) << std::endl;
         if (mirrorType == DWM_THUMBNAIL)
         {
-            updateThumbnailPosition(0, 0, (HIWORD(wParam) * 10), (HIWORD(wParam) * 10));
+            setThumbnailPosition(-1, -1, (HIWORD(wParam) * 10), (HIWORD(wParam) * 10));
         }
         else
         {
