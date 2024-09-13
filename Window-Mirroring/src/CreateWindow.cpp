@@ -79,18 +79,36 @@ void handleHorizontalScrolling(HWND hWnd, WPARAM wParam)
         // Scrolls left by one unit
     case SB_LINELEFT:
         scrollInfo.nPos -= SCROLL_OFFSET;
-        windowX -= (SCROLL_OFFSET * 10);
+        if (mirrorType == DWM_THUMBNAIL)
+        {
+            adjustThumbnailPosition((-SCROLL_OFFSET * 10), (-SCROLL_OFFSET * 10), 0, 0);
+        }
+        else 
+        {
+            windowX -= (SCROLL_OFFSET * 10);
+        }
         break;
 
         // Scrolls right by one unit
     case SB_LINERIGHT:
         scrollInfo.nPos += SCROLL_OFFSET;
-        windowX += (SCROLL_OFFSET * 10);
+        if (mirrorType == DWM_THUMBNAIL)
+        {
+            adjustThumbnailPosition((SCROLL_OFFSET * 10), (SCROLL_OFFSET * 10), 0, 0);
+        }
+        else
+        {
+            windowX += (SCROLL_OFFSET * 10);
+        }
         break;
 
         // User is dragging the scrollbox
     case SB_THUMBTRACK:
         scrollInfo.nPos = HIWORD(wParam);
+        if (mirrorType == DWM_THUMBNAIL)
+        {
+            setThumbnailPosition((HIWORD(wParam) * 10), (HIWORD(wParam) * 10), -1, -1);
+        }
         windowX = HIWORD(wParam) * 10;
         break;
     }

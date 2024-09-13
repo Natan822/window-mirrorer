@@ -25,7 +25,6 @@ DWORD WINAPI bitBltMirror(int target) {
 
 	while (true) {
 		::GetWindowRect(targetHandle, &targetRect);
-
 		::BitBlt(
 			mainDC,
 			0,
@@ -131,27 +130,46 @@ DWORD WINAPI mirrorWindow(LPVOID lParam) {
 }
 
 void adjustThumbnailPosition(int leftOffset, int rightOffset, int topOffset, int bottomOffset) {
-	dskThumbProps.rcSource.left += leftOffset;
-	dskThumbProps.rcSource.right += rightOffset;
-	dskThumbProps.rcSource.top += topOffset;
-	dskThumbProps.rcSource.bottom += bottomOffset;
+	RECT* rect = &dskThumbProps.rcSource;
+
+	if (rect->left + leftOffset < 0)
+	{
+		rect->left = 0;
+	}else rect->left += leftOffset;
+
+	if (rect->right + rightOffset - initialRcRight < 0)
+	{
+		rect->right = 0;
+	}else rect->right += rightOffset;
+
+	if (rect->top + topOffset < 0)
+	{
+		rect->top = 0;
+	}else rect->top += topOffset;
+	
+	if (rect->bottom + bottomOffset - initialRcBottom < 0)
+	{
+		rect->bottom = 0;
+	}else rect->bottom += bottomOffset;
 }
 
 void setThumbnailPosition(int left, int right, int top, int bottom) {
+	RECT* rect = &dskThumbProps.rcSource;
+
 	if (left >= 0)
 	{
-		dskThumbProps.rcSource.left = left;
+		rect->left = left;
 	}
 	if (right >= 0)
 	{
-		dskThumbProps.rcSource.right = initialRcRight + right;
+		rect->right = initialRcRight + right;
 	}
 	if (top >= 0)
 	{
-		dskThumbProps.rcSource.top = top;
+		rect->top = top;
 	}
 	if (bottom >= 0)
 	{
-		dskThumbProps.rcSource.bottom = initialRcBottom + bottom;
+		rect->bottom = initialRcBottom + bottom;
 	}
 }
