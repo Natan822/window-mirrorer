@@ -17,12 +17,19 @@ void handleVerticalScrolling(HWND hWnd, WPARAM wParam) {
     // User's scrolling request
     switch (LOWORD(wParam))
     {
-        // Scrolls up by one unit
+    // Scrolls up by one unit
     case SB_LINEUP:
+        if (scrollInfo.nPos == 0) 
+            break;
+
         scrollInfo.nPos -= SCROLL_OFFSET;
+        if (scrollInfo.nPos < 0)
+        {
+            scrollInfo.nPos = 0;
+        }
         if (mirrorType == DWM_THUMBNAIL)
         {
-            adjustThumbnailPosition(0, 0, (-SCROLL_OFFSET * 10), (-SCROLL_OFFSET * 10));
+            adjustThumbnailPosition(0, 0, (-SCROLL_OFFSET * 10), (-SCROLL_OFFSET * 10), false);
         }
         else
         {
@@ -35,7 +42,7 @@ void handleVerticalScrolling(HWND hWnd, WPARAM wParam) {
         scrollInfo.nPos += SCROLL_OFFSET;
         if (mirrorType == DWM_THUMBNAIL)
         {
-            adjustThumbnailPosition(0, 0, (SCROLL_OFFSET * 10), (SCROLL_OFFSET * 10));
+            adjustThumbnailPosition(0, 0, (SCROLL_OFFSET * 10), (SCROLL_OFFSET * 10), false);
         }
         else
         {
@@ -45,8 +52,12 @@ void handleVerticalScrolling(HWND hWnd, WPARAM wParam) {
 
         // User is dragging the scrollbox
     case SB_THUMBTRACK:
+        if (scrollInfo.nPos == HIWORD(wParam)) {
+            break;
+        }
+
+        ::GetWindowRect(mainWindowHandle, &mainRect);
         scrollInfo.nPos = HIWORD(wParam);
-        std::cout << HIWORD(wParam) << std::endl;
         if (mirrorType == DWM_THUMBNAIL)
         {
             setThumbnailPosition(-1, -1, (HIWORD(wParam) * 10), (HIWORD(wParam) * 10));
@@ -78,10 +89,17 @@ void handleHorizontalScrolling(HWND hWnd, WPARAM wParam)
     {
         // Scrolls left by one unit
     case SB_LINELEFT:
+        if (scrollInfo.nPos == 0)
+            break;
+
         scrollInfo.nPos -= SCROLL_OFFSET;
+        if (scrollInfo.nPos < 0)
+        {
+            scrollInfo.nPos = 0;
+        }
         if (mirrorType == DWM_THUMBNAIL)
         {
-            adjustThumbnailPosition((-SCROLL_OFFSET * 10), (-SCROLL_OFFSET * 10), 0, 0);
+            adjustThumbnailPosition((-SCROLL_OFFSET * 10), (-SCROLL_OFFSET * 10), 0, 0, false);
         }
         else 
         {
@@ -94,7 +112,7 @@ void handleHorizontalScrolling(HWND hWnd, WPARAM wParam)
         scrollInfo.nPos += SCROLL_OFFSET;
         if (mirrorType == DWM_THUMBNAIL)
         {
-            adjustThumbnailPosition((SCROLL_OFFSET * 10), (SCROLL_OFFSET * 10), 0, 0);
+            adjustThumbnailPosition((SCROLL_OFFSET * 10), (SCROLL_OFFSET * 10), 0, 0, false);
         }
         else
         {
@@ -104,12 +122,20 @@ void handleHorizontalScrolling(HWND hWnd, WPARAM wParam)
 
         // User is dragging the scrollbox
     case SB_THUMBTRACK:
+        if (scrollInfo.nPos == HIWORD(wParam)) {
+            break;
+        }
+
+        ::GetWindowRect(mainWindowHandle, &mainRect);
         scrollInfo.nPos = HIWORD(wParam);
         if (mirrorType == DWM_THUMBNAIL)
         {
+            std::cout << (HIWORD(wParam) * 10) << std::endl;
             setThumbnailPosition((HIWORD(wParam) * 10), (HIWORD(wParam) * 10), -1, -1);
         }
-        windowX = HIWORD(wParam) * 10;
+        else {
+            windowX = HIWORD(wParam) * 10;
+        }
         break;
     }
     ::SetScrollInfo(hWnd, SB_HORZ, &scrollInfo, FALSE);
@@ -121,6 +147,25 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
     switch (uMsg)
     {
+
+    case WM_MOVE:
+        ::GetWindowRect(mainWindowHandle, &mainRect);
+        break;
+
+    case WM_SIZING:
+    {
+        RECT previousRect = mainRect;
+        ::GetWindowRect(mainWindowHandle, &mainRect);
+
+        int diffLeft = mainRect.left - previousRect.left;
+        int diffRight = mainRect.right - previousRect.right;
+        int diffTop = mainRect.top- previousRect.top;
+        int diffBottom = mainRect.bottom - previousRect.bottom;
+        
+        adjustThumbnailPosition(diffLeft, diffRight, diffTop, diffBottom, true);
+
+        break;
+    }
     case WM_SETCURSOR:
         ::SetCursor(LoadCursor(NULL, IDC_ARROW));
         break;
@@ -201,7 +246,7 @@ HWND CreateMainWindow(HINSTANCE hInstance) {
 
     adjustScrollBarsSize(hWnd);
 
-    // Makes the window topmost
+    // Make the window topmost
     ::SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
     return hWnd;

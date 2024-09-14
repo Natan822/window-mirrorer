@@ -10,6 +10,8 @@ extern int windowX;
 extern int windowY;
 
 extern HWND mainWindowHandle;
+extern RECT mainRect;
+
 extern HWND targetHandle;
 extern RECT targetRect;
 
