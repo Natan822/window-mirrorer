@@ -26,7 +26,10 @@ void handleVerticalScrolling(HWND hWnd, WPARAM wParam) {
         if (scrollInfo.nPos < 0)
         {
             scrollInfo.nPos = 0;
+            setThumbnailPosition(-1, -1, 0, 0);
+            break;
         }
+
         if (mirrorType == DWM_THUMBNAIL)
         {
             adjustThumbnailPosition(0, 0, (-SCROLL_OFFSET * 10), (-SCROLL_OFFSET * 10), false);
@@ -95,16 +98,20 @@ void handleHorizontalScrolling(HWND hWnd, WPARAM wParam)
         scrollInfo.nPos -= SCROLL_OFFSET;
         if (scrollInfo.nPos < 0)
         {
+            int diff = scrollInfo.nPos;
             scrollInfo.nPos = 0;
-        }
-        if (mirrorType == DWM_THUMBNAIL)
-        {
-            adjustThumbnailPosition((-SCROLL_OFFSET * 10), (-SCROLL_OFFSET * 10), 0, 0, false);
-        }
-        else 
-        {
-            windowX -= (SCROLL_OFFSET * 10);
-        }
+            setThumbnailPosition(0, 0, -1, -1);
+            break;
+		}
+
+		if (mirrorType == DWM_THUMBNAIL)
+		{
+			adjustThumbnailPosition((-SCROLL_OFFSET * 10), (-SCROLL_OFFSET * 10), 0, 0, false);
+		}
+		else
+		{
+			windowX -= (SCROLL_OFFSET * 10);
+		}
         break;
 
         // Scrolls right by one unit

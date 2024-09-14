@@ -16,24 +16,24 @@ const bool CONSOLE_ENABLED = false;
 
 int main() {
 
-	if (CONSOLE_ENABLED)
+	/*if (CONSOLE_ENABLED)
 	{
 		::AllocConsole();
 		FILE* pCout;
 		freopen_s(&pCout, "CONOUT$", "w", stdout);
-	}
+	}*/
 	
 	::EnumWindows(enumWindowsProc, NULL);
 
 	listWindows();
 
-	std::cout << "Type in the window to be mirrored: ";
+	std::cout << "Type in the number of the window to be mirrored: ";
 	int input;
 	std::cin >> input;
 	std::cin.get();
 
 	//mainWindowHandle = CreateMainWindow(hInstance);
-	mainWindowHandle = ::CreateMainWindow(NULL);
+	mainWindowHandle = CreateMainWindow(NULL);
 
 	if (mainWindowHandle == NULL) 
 	{
